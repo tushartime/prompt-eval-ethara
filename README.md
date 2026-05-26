@@ -11,38 +11,74 @@ An RLHF-powered platform that evaluates ChatGPT and Gemini responses across 7 di
 - **Winner Declaration**: Animated winner banner with confetti celebration
 - **Production Ready**: Rate limiting, input sanitization, error handling, accessibility support
 
-## Quick Start
+## Project Options
+
+This repository offers two distinct ways to run and deploy the platform:
+
+1. **Option A: Standalone Python (FastAPI + React SPA)**: A single-file python script (`goldenresponse.py`) that serves both a beautiful React+Tailwind single-page dashboard and the evaluation API. Great for simple setups.
+2. **Option B: Full-Stack Node.js & React/Vite**: A structured production folder (`GoldenResponse/`) with an Express API backend and an isolated React/Vite/Tailwind frontend.
+
+---
+
+## ⚡ Option A: Standalone Python Setup
 
 ### Prerequisites
-
-- Node.js 18+
+- Python 3.9+
 - Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey)
 
-### Installation
+### Running the App
+1. Create a `.env` file at the root:
+   ```env
+   GEMINI_API_KEY=your_gemini_api_key_here
+   PORT=3001
+   ```
+2. Install Python dependencies:
+   ```bash
+   pip install fastapi uvicorn google-genai python-dotenv
+   ```
+3. Start the server:
+   ```bash
+   python goldenresponse.py
+   ```
+4. Open your browser to **http://localhost:3001** to view the interactive dashboard.
 
-```bash
-cd prompt-evaluator
+---
 
-# Backend setup
-cd backend
-npm install
-cp .env.example .env
-# Add your GEMINI_API_KEY to .env
-npm run dev
+## 💻 Option B: Full-Stack Node.js & Vite/React Setup
 
-# Frontend setup (new terminal)
-cd frontend
-npm install
-cp .env.example .env
-npm run dev
-```
+### Prerequisites
+- Node.js 18+
+- Gemini API key
 
-Open http://localhost:5173
+### Running the App
+1. Navigate into the folder:
+   ```bash
+   cd GoldenResponse
+   ```
 
-### Environment Variables
+2. **Backend Setup**:
+   ```bash
+   cd backend
+   npm install
+   cp .env.example .env
+   # Add your GEMINI_API_KEY to backend/.env
+   npm run dev
+   ```
 
-**Backend (`backend/.env`)**
+3. **Frontend Setup** (in a new terminal tab):
+   ```bash
+   cd GoldenResponse/frontend
+   npm install
+   cp .env.example .env
+   npm run dev
+   ```
+4. Open your browser to **http://localhost:5173**.
 
+---
+
+## Environment Variables
+
+**Backend (`GoldenResponse/backend/.env`)**
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
 GEMINI_MODEL=gemini-2.0-flash
@@ -52,8 +88,7 @@ RATE_LIMIT_MAX=10
 FRONTEND_URL=http://localhost:5173
 ```
 
-**Frontend (`frontend/.env`)**
-
+**Frontend (`GoldenResponse/frontend/.env`)**
 ```env
 VITE_API_URL=http://localhost:3001
 ```
@@ -72,15 +107,8 @@ VITE_API_URL=http://localhost:3001
 
 ## Tech Stack
 
-- **Frontend**: React 18, Vite, Tailwind CSS, Framer Motion, Recharts
-- **Backend**: Node.js, Express, Google Generative AI SDK
-
-## Usage
-
-1. Enter your prompt (min 20 chars)
-2. Paste ChatGPT and Gemini responses (min 50 chars each)
-3. Click "Run Evaluation"
-4. View comprehensive results with radar chart, bar chart, and dimension scores
+- **Option A**: Python, FastAPI, Uvicorn, React 18 (CDN), Tailwind CSS (CDN), Chart.js (CDN), Canvas-Confetti (CDN)
+- **Option B**: React 18, Vite, Tailwind CSS, Framer Motion, Recharts, Express, Node.js, `@google/generative-ai`
 
 ## Security
 
@@ -93,3 +121,4 @@ VITE_API_URL=http://localhost:3001
 ## License
 
 MIT
+
