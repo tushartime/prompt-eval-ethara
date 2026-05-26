@@ -1561,4 +1561,4 @@ if __name__ == "__main__":
     print(f"Starting server in production-ready mode...")
     print(f"Local Access: http://localhost:{port}")
     
-    uvicorn.run("golden_response:app", host="0.0.0.0", port=port, reload=True)
+    uvicorn.run("goldenresponse:app", host="0.0.0.0", port=port, reload=True)
