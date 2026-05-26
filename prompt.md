@@ -1,154 +1,143 @@
 Prompt
 
 Context and Role
-You're putting this together as a full-stack dev with a focus on modern web apps and AI integration. Your job is to design and deliver a production-ready Prompt Evaluation website—responsive, accessible, and refined. Use Framer Motion for immersive, scroll-driven storytelling animations without sacrificing performance, accessibility, or production quality.
-
-The site compares ChatGPT and Gemini responses using an RLHF-style 7-dimension scoring system. A neutral AI judge (Gemini 2.0 Flash via the Google Generative AI API) scores both sides. Each response gets a Likert score (1–5) per dimension, a brief explanation (100–200 characters), and a weighted aggregate score. Results show up in an animated comparison dashboard with a clear winner callout.
+You’re building this as a full-stack developer who cares about modern web apps and thoughtful AI integration. Your job is to design and ship a polished AI Response Evaluation platform—fast, responsive, accessible, and genuinely nice to use. Lean on Framer Motion for scroll-driven storytelling and motion that feels intentional, not flashy, and never at the expense of performance or accessibility.
+The app lets someone paste a prompt plus a ChatGPT answer and a Gemini answer, then compares them through an RLHF-style lens across seven dimensions. Gemini 2.0 Flash (via the Google Generative AI API) plays the neutral judge: each side gets a Likert score (1–5) per dimension, a short rationale (about 100–250 characters), and a weighted overall score. When the dust settles, the UI should tell the story clearly—animated comparison, charts, and a winner people can trust at a glance.
 
 Objective
-Build a complete full-stack Prompt Evaluation platform that:
-
-Accepts a user prompt, a ChatGPT response, and a Gemini response.
-
-
-Sends both responses to gemini-2.0-flash for unbiased RLHF evaluation.
+Ship a complete full-stack AI Response Evaluation platform that:
+Implements scroll-based storytelling animations using Framer Motion.
 
 
-Scores both responses across 7 evaluation dimensions.
+Feels modern and responsive, with transitions that support the flow instead of fighting it.
 
 
-Returns Likert scores (1–5), short explanations, and aggregate scores for each model.
+Lets users paste a prompt, a ChatGPT response, and a Gemini response.
 
 
-Displays results inside an animated comparison dashboard.
+Sends everything to gemini-2.0-flash for a fair, RLHF-style evaluation.
 
 
-Declares the winning model based on the final aggregate score.
+Scores both answers across all seven dimensions, with weights that reflect how much each dimension matters.
 
 
+Returns Likert scores (1–5), those short explanations, and weighted aggregate scores for each model.
+
+
+Surfaces results in an animated comparison dashboard—radar and bar charts included.
+
+
+Names a winner from the higher weighted aggregate (or a tie when it’s dead even).
 
 AI Judge Configuration
 Model
 gemini-2.0-flash
 
-
 API
 Google Generative AI SDK (@google/generative-ai)
 
-
 API Key
-Keep the key in `.env` only:
-
+Keep the key in environment variables only—never ship it to the browser or bake it into the client bundle:
 GEMINI_API_KEY=your_key_here
 
-
 Judge Role
-The judge should act as a strict, impartial RLHF evaluator—no favoritism toward either model.
-
+The judge should read like a careful human reviewer: strict, fair, and not rooting for either side.
 
 Judge Prompt Rules
-Return raw JSON only.
+Return raw JSON only—no markdown fences, no backticks, no chit-chat before or after.
 
 
-No markdown, backticks, or extra text.
+Strip any wrapper text before you try to parse.
 
 
-Strip any wrapper text before parsing.
+Use temperature 0.2 so scores stay steady run to run.
 
 
-Use temperature: 0.2 for stable, consistent scoring.
-
+If parsing blows up once, retry once before you give up.
 
 Expected JSON Output
-
 {
   "chatgpt": {
-    "correctness": { "score": 1, "explanation": "string 100–200 chars" },
-    "completeness": { "score": 1, "explanation": "string 100–200 chars" },
-    "coherence": { "score": 1, "explanation": "string 100–200 chars" },
-    "relevance": { "score": 1, "explanation": "string 100–200 chars" },
-    "helpfulness": { "score": 1, "explanation": "string 100–200 chars" },
-    "creativity": { "score": 1, "explanation": "string 100–200 chars" },
-    "style_presentation": { "score": 1, "explanation": "string 100–200 chars" },
-    "aggregate_score": 0.0
+    "correctness": { "score": 1, "explanation": "string 100–250 chars" },
+    "completeness": { "score": 1, "explanation": "string 100–250 chars" },
+    "coherence": { "score": 1, "explanation": "string 100–250 chars" },
+    "relevance": { "score": 1, "explanation": "string 100–250 chars" },
+    "helpfulness": { "score": 1, "explanation": "string 100–250 chars" },
+    "creativity": { "score": 1, "explanation": "string 100–250 chars" },
+    "style_presentation": { "score": 1, "explanation": "string 100–250 chars" }
   },
   "gemini": {
-    "correctness": { "score": 1, "explanation": "string 100–200 chars" },
-    "completeness": { "score": 1, "explanation": "string 100–200 chars" },
-    "coherence": { "score": 1, "explanation": "string 100–200 chars" },
-    "relevance": { "score": 1, "explanation": "string 100–200 chars" },
-    "helpfulness": { "score": 1, "explanation": "string 100–200 chars" },
-    "creativity": { "score": 1, "explanation": "string 100–200 chars" },
-    "style_presentation": { "score": 1, "explanation": "string 100–200 chars" },
-    "aggregate_score": 0.0
-  },
-  "winner": "chatgpt | gemini | tie"
+    "correctness": { "score": 1, "explanation": "string 100–250 chars" },
+    "completeness": { "score": 1, "explanation": "string 100–250 chars" },
+    "coherence": { "score": 1, "explanation": "string 100–250 chars" },
+    "relevance": { "score": 1, "explanation": "string 100–250 chars" },
+    "helpfulness": { "score": 1, "explanation": "string 100–250 chars" },
+    "creativity": { "score": 1, "explanation": "string 100–250 chars" },
+    "style_presentation": { "score": 1, "explanation": "string 100–250 chars" }
+  }
 }
 
-
 Aggregate Score
-Take the mean of all 7 dimension scores.
+Blend the dimensions with these weights—correctness carries the most weight because wrong-but-pretty isn’t useful:
+correctness: 25%, completeness: 15%, coherence: 15%, relevance: 15%, helpfulness: 15%, creativity: 5%, style_presentation: 10%.
 
 
-Round to 2 decimal places.
+Round the final number to two decimal places.
 
+
+If the model skips aggregates, compute them yourself on the backend so the UI always has something solid to show.
 
 Winner Logic
-Higher aggregate score wins.
+Whoever has the higher weighted aggregate wins.
 
 
-If scores are equal, return "tie".
-
-
+If it’s a wash, call it "tie".
 
 Evaluation Dimensions
-Correctness — How accurate the answer is; watch for hallucinations.
+Correctness — Is it actually right? Watch for hallucinations and sloppy facts (weight: 25%).
 
 
-Completeness — Whether the response fully answers the prompt.
+Completeness — Did it cover what the prompt asked for, not just the easy parts (weight: 15%).
 
 
-Coherence — Logical flow and internal consistency.
+Coherence — Does it hang together—structure, logic, no contradictions (weight: 15%).
 
 
-Relevance — Stays on topic without drifting.
+Relevance — Does it stay on the rails or wander off (weight: 15%).
 
 
-Helpfulness — Practical value and actionability.
+Helpfulness — Would a real person leave with something they can use (weight: 15%).
 
 
-Creativity — Originality and depth of ideas.
+Creativity — Fresh angles or depth, without gimmicks for gimmicks’ sake (weight: 5%).
 
 
-Style & Presentation — Clarity, formatting, readability, and tone.
-
+Style & Presentation — Clear writing, sensible formatting, tone that fits the task (weight: 10%).
 
 Likert Scale
-1 = Poor
+1 = Poor (significant issues)
 
 
-2 = Fair
+2 = Fair (below average)
 
 
-3 = Average
+3 = Average (acceptable)
 
 
-4 = Good
+4 = Good (above average)
 
 
-5 = Excellent
-
-
+5 = Excellent (exceptional)
 
 UI and Animation Requirements
 Scroll-Based Storytelling
-Use Framer Motion for scroll-triggered animations.
+Use Framer Motion for scroll-triggered moments that reward scrolling instead of punishing it.
 
 
-Add parallax, fade-ins, and staggered transitions where they help the narrative.
+Layer in parallax, fade-ins, and staggered reveals where they help the story breathe.
 
 
-Animate sections in sequence so the page feels like a story, not a static form.
+Sequence sections so the page reads like a journey: landing → input → waiting → payoff.
 
 
 Smooth transitions between:
@@ -169,54 +158,52 @@ Results Dashboard
 Winner Summary
 
 
-Required Framer Motion features: useInView, motion.div, AnimatePresence, useAnimation.
+Lean on these Framer Motion pieces where they earn their keep: useInView, motion.div, AnimatePresence, useScroll, useTransform.
 
 
 Animations should:
 
 
-Stay performant (avoid layout thrashing).
+Stay snappy—no layout thrashing from animating the wrong properties
 
 
-Prefer GPU-friendly properties (transform, opacity).
+Stick to GPU-friendly stuff (transform, opacity) whenever you can
 
 
-Never block scroll or typing.
+Never make scrolling or typing feel sticky or laggy
 
 
-Honor prefers-reduced-motion.
-
-
+Respect prefers-reduced-motion so nobody gets motion sick for your confetti
 
 Layout Requirements
-The app needs:
-
-Hero section with animated heading and word-by-word reveal.
+The application must include:
 
 
-Input section with three animated textareas and live character counters.
+Hero section with animated introduction and word-by-word headline reveal
 
 
-Loading state with full-screen overlay and sequential progress steps.
+Input section with three animated textareas and live character counters
 
 
-Results dashboard with side-by-side score cards and charts.
+Loading state with full-screen overlay and sequential progress steps
 
 
-Winner section with animated banner, confetti, and a re-evaluate control.
+Results dashboard with side-by-side score cards, radar chart, and bar chart
 
 
-Overall layout:
-
-Fully responsive (mobile, tablet, desktop).
+Winner section with animated banner, confetti celebration, and re-evaluate control
 
 
-Accessible (ARIA labels, semantic HTML, keyboard navagation).
+The layout must be:
 
 
-Tuned for performance.
+Fully responsive (mobile, tablet, desktop)
 
 
+Accessible (ARIA labels, semantic HTML, keyboard navigation)
+
+
+Optimized for performance
 
 Section Details
 Hero Section
@@ -229,34 +216,31 @@ Word-by-word reveal on the headline.
 Scroll indicator with a subtle bounce.
 
 
-Animated gradient mesh background.
-
+Animated gradient mesh background with parallax blur orbs.
 
 Input Section
 Three animated textareas: Prompt (min 20 chars), ChatGPT response (min 50), Gemini response (min 50).
 
 
-Live character counter on each field.
+Live character counter on each field with color feedback near limits.
 
 
-Animated validation errors when somethings off.
+Animated validation errors when fields are invalid.
 
 
-Evaluate button with hover pulse animation.
-
+"Run Evaluation" button with hover pulse animation.
 
 Loading State
 Full-screen loading overlay.
 
 
-Pulsing Gemini brain icon.
+Pulsing brain icon.
 
 
-Sequential loading steps (tell the user whats happening).
+Sequential loading steps that communicate evaluation progress.
 
 
 Smooth animated progress bar.
-
 
 Results Dashboard
 Side-by-side score cards with count-up animation.
@@ -270,17 +254,14 @@ Color-coded borders: Green (≥ 4), Amber (= 3), Red (≤ 2).
 
 Radar / spider chart plus aggregate comparison bar chart.
 
-
 Winner Section
 Animated winner banner with confetti burst and trophy animation.
 
 
-Aggregate score comparison.
+Aggregate score comparison for both models.
 
 
-“Re-evaluate” reset button with exit animation.
-
-
+"Re-evaluate" reset button with exit animation.
 
 Input and Validation Requirements
 Form Fields
@@ -292,34 +273,33 @@ ChatGPT response (required, minimum 50 characters).
 
 Gemini response (required, minimum 50 characters).
 
-
 Validation
-Client-side validation with clear error messages.
+Validate on the client first, with messages people can act on.
 
 
-Show inline animated validation errors.
+Show inline animated validation errors so problems are obvious before submit.
 
 
-Block the API call until validation passess.
+Don’t hit the API until everything passes.
 
 
 Character counters on all textareas.
 
 
+Cap each field at 4000 characters so requests stay reasonable.
 
 Backend Requirements
-API Endpoint
-POST /api/evaluate for evaluation requests.
+Implement an API endpoint to handle evaluation requests.
 
+API Endpoint
+POST /api/evaluate
 
 Request Body
-
 {
   "prompt": "string",
   "chatgptResponse": "string",
   "geminiResponse": "string"
 }
-
 
 Backend Processing Flow
 Validate and sanitize all inputs.
@@ -334,47 +314,53 @@ Call gemini-2.0-flash.
 Parse and validate the JSON response.
 
 
-Compute aggregate scores if the model didn't return them.
+Compute weighted aggregate scores if the model did not return them.
 
 
-Return structured results.
-
+Determine winner and return structured results.
 
 Success Response
-
 {
   "success": true,
-  "data": {},
-  "timestamp": "ISO string"
+  "data": {
+    "chatgpt": { "...dimensions...", "aggregate_score": 0.0 },
+    "gemini": { "...dimensions...", "aggregate_score": 0.0 },
+    "winner": "chatgpt | gemini | tie"
+  },
+  "timestamp": "ISO string",
+  "duration_ms": 0
 }
 
 Error Response
-
 {
   "success": false,
   "error": "Descriptive error message",
-  "code": "VALIDATION_ERROR | API_ERROR | PARSE_ERROR"
+  "code": "VALIDATION_ERROR | PARSE_ERROR | API_AUTH_ERROR | QUOTA_EXCEEDED | INTERNAL_ERROR"
 }
 
 Security
-Guard against XSS.
+Clean inputs so XSS and injection don’t get a foothold.
 
 
-Rate limit to 10 requests per minute per IP.
+Rate limit to 10 requests per minute per IP so one noisy client can’t burn your quota.
 
 
 Never send GEMINI_API_KEY to the frontend.
 
 
-Validate all judge JSON before it reaches the client.
+Validate judge JSON before anything goes back to the browser.
 
 
-Log backend failures with timestamps and input hashes (not raw secrets).
-
-
+Log failures with timestamps—skip logging secrets or full raw payloads if they’re sensitive.
 
 Data Processing Requirements
-Sanitize inputs against XSS and injection.
+Sanitize all inputs to prevent:
+
+
+XSS attacks
+
+
+Injection attacks
 
 
 Strip HTML and script tags.
@@ -386,21 +372,28 @@ Enforce minimum lengths: prompt 20 characters, responses 50 characters.
 Truncate inputs at 4000 characters.
 
 
-Parse Gemini JSON safely.
+Parse Gemini JSON safely (strip markdown fences, extract JSON object).
 
 
-Ensure all 7 dimensions are present in the reponse.
+Ensure all 7 dimensions are present in the response.
 
 
-Compute aggregate scores if missing.
+Validate scores are integers 1–5 and explanations are 100–250 characters.
 
 
-Always return structured JSON with clear success or error payloads.
+Compute weighted aggregate scores if missing.
 
 
+Ensure API returns structured JSON responses:
+
+
+Success message with evaluation data
+
+
+Error message (if applicable)
 
 Output Requirements
-Fully animated evaluation flow with scroll-based storytelling.
+Smooth animated storytelling evaluation flow.
 
 
 Structured RLHF scoring across 7 dimensions.
@@ -415,24 +408,28 @@ Winner announcement with confetti and trophy animations.
 Loading states and graceful error handling.
 
 
-Clear confirmation when results are ready.
+Confirmation when results are ready via animated dashboard reveal.
 
 
+Graceful error handling if the AI judge or network fails.
 
 Error Handling and Documentation
-Frontend: graceful validation errors with animated inline messages.
+Handle frontend form errors gracefully.
 
 
-Backend: structured error responses for validation failures.
+Handle backend validation errors.
 
 
-Return 400 for validation issues and 502 for Gemini API failures.
+Provide structured error responses.
 
 
-Retry once if JSON parsing fail.
+Return 400 for validation issues and 502 for Gemini API / parse failures.
 
 
-30-second timeout on judge calls.
+Retry once if JSON parsing fails.
+
+
+30–45 second timeout on judge calls.
 
 
 Log backend failures appropriately.
@@ -452,32 +449,30 @@ Environment variable configuration
 
 Deployment steps
 
-
-
 Performance and Scalability
 Keep the bundle lean.
 
 
-Lazy-load heavy pieces (charts, confetti).
+Lazy-load heavy components (charts, confetti).
 
 
-Don't let animations hurt scroll or input.
+Ensure animations do not degrade performance.
 
 
-Handle concurrent evaluations without clogging up the API.
+Support concurrent evaluations without API bottlenecks.
 
 
-Rate limit to prevent abuse.
+Use rate limiting to prevent abuse.
 
 
-Accessibility and SEO basics covered.
-
-
+Ensure accessibility and SEO optimization.
 
 Technology Stack
 Use the following:
 Frontend:
-React 18+ (or Next.js)
+
+
+React 18+
 
 
 Vite
@@ -489,14 +484,21 @@ Framer Motion
 Tailwind CSS (or equivalent styling solution)
 
 
-Recharts or Chart.js for charts
+Recharts for charts
 
 
 canvas-confetti for winner celebration
 
 
+lucide-react for icons
+
+
+axios for API calls
+
 Backend:
-Node.js + Express (or Next.js API routes)
+
+
+Node.js + Express
 
 
 Google Generative AI SDK (@google/generative-ai)
@@ -505,71 +507,83 @@ Google Generative AI SDK (@google/generative-ai)
 express-rate-limit for rate limiting
 
 
-DOMPurify or sanitize-html for input sanitization
+sanitize-html for input sanitization
 
 
 dotenv for environment configuration
 
-
 Optional:
-MongoDB for storing evaluation history
 
 
+MongoDB or PostgreSQL for storing evaluation history
 
 Folder Structure
-
-prompt-evaluator/
+GoldenResponse.py/
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
+│   │   │   ├── Hero.jsx
+│   │   │   ├── InputForm.jsx
+│   │   │   ├── LoadingOverlay.jsx
+│   │   │   ├── ResultsDashboard.jsx
+│   │   │   ├── ScoreCard.jsx
+│   │   │   ├── RadarChart.jsx
+│   │   │   ├── BarChart.jsx
+│   │   │   ├── WinnerBanner.jsx
+│   │   │   └── ErrorState.jsx
 │   │   ├── hooks/
+│   │   │   ├── useEvaluate.js
+│   │   │   └── useScrollAnimation.js
 │   │   ├── utils/
+│   │   │   └── validate.js
 │   │   ├── App.jsx
 │   │   └── main.jsx
 │   └── index.html
 ├── backend/
 │   ├── routes/
+│   │   └── evaluate.js
 │   ├── services/
+│   │   └── geminiJudge.js
 │   ├── middleware/
+│   │   ├── rateLimiter.js
+│   │   └── sanitize.js
 │   ├── utils/
+│   │   └── parseGeminiResponse.js
 │   └── server.js
-├── .env
 ├── .env.example
 └── README.md
 
-
-
 Environment Variables
-
+Backend (.env):
 GEMINI_API_KEY=your_gemini_api_key_here
 GEMINI_MODEL=gemini-2.0-flash
 PORT=3001
 RATE_LIMIT_WINDOW_MS=60000
 RATE_LIMIT_MAX=10
+FRONTEND_URL=http://localhost:5173
 NODE_ENV=development
 
-
+Frontend (.env):
+VITE_API_URL=http://localhost:3001
 
 Setup Instructions
-
-# Clone repository
-git clone <repo>
-cd prompt-evaluator
+# Navigate to project
+cd GoldenResponse.py
 
 # Backend setup
 cd backend
 npm install
-cp ../.env.example ../.env
-# Add GEMINI_API_KEY
+cp .env.example .env
+# Add GEMINI_API_KEY to .env
 npm run dev
 
-# Frontend setup
+# Frontend setup (new terminal)
 cd ../frontend
 npm install
 cp .env.example .env
 npm run dev
 
-
+Open http://localhost:5173
 
 Deployment Steps
 Add GEMINI_API_KEY to production secrets.
