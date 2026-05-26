@@ -1,35 +1,24 @@
 Prompt
 
-Context and Role
+Context and Role 
+
 You’re building this as a full-stack developer who cares about modern web apps and thoughtful AI integration. Your job is to design and ship a polished AI Response Evaluation platform—fast, responsive, accessible, and genuinely nice to use. Lean on Framer Motion for scroll-driven storytelling and motion that feels intentional, not flashy, and never at the expense of performance or accessibility.
 The app lets someone paste a prompt plus a ChatGPT answer and a Gemini answer, then compares them through an RLHF-style lens across seven dimensions. Gemini 2.0 Flash (via the Google Generative AI API) plays the neutral judge: each side gets a Likert score (1–5) per dimension, a short rationale (about 100–250 characters), and a weighted overall score. When the dust settles, the UI should tell the story clearly—animated comparison, charts, and a winner people can trust at a glance.
 
 Objective
+
 Ship a complete full-stack AI Response Evaluation platform that:
 Implements scroll-based storytelling animations using Framer Motion.
-
-
 Feels modern and responsive, with transitions that support the flow instead of fighting it.
-
-
 Lets users paste a prompt, a ChatGPT response, and a Gemini response.
-
-
 Sends everything to gemini-2.0-flash for a fair, RLHF-style evaluation.
-
-
 Scores both answers across all seven dimensions, with weights that reflect how much each dimension matters.
-
-
 Returns Likert scores (1–5), those short explanations, and weighted aggregate scores for each model.
-
-
 Surfaces results in an animated comparison dashboard—radar and bar charts included.
-
-
 Names a winner from the higher weighted aggregate (or a tie when it’s dead even).
 
 AI Judge Configuration
+
 Model
 gemini-2.0-flash
 
@@ -45,14 +34,8 @@ The judge should read like a careful human reviewer: strict, fair, and not rooti
 
 Judge Prompt Rules
 Return raw JSON only—no markdown fences, no backticks, no chit-chat before or after.
-
-
 Strip any wrapper text before you try to parse.
-
-
 Use temperature 0.2 so scores stay steady run to run.
-
-
 If parsing blows up once, retry once before you give up.
 
 Expected JSON Output
@@ -80,20 +63,15 @@ Expected JSON Output
 Aggregate Score
 Blend the dimensions with these weights—correctness carries the most weight because wrong-but-pretty isn’t useful:
 correctness: 25%, completeness: 15%, coherence: 15%, relevance: 15%, helpfulness: 15%, creativity: 5%, style_presentation: 10%.
-
-
 Round the final number to two decimal places.
-
-
 If the model skips aggregates, compute them yourself on the backend so the UI always has something solid to show.
 
 Winner Logic
 Whoever has the higher weighted aggregate wins.
-
-
 If it’s a wash, call it "tie".
 
 Evaluation Dimensions
+
 Correctness — Is it actually right? Watch for hallucinations and sloppy facts (weight: 25%).
 
 
@@ -115,6 +93,7 @@ Creativity — Fresh angles or depth, without gimmicks for gimmicks’ sake (wei
 Style & Presentation — Clear writing, sensible formatting, tone that fits the task (weight: 10%).
 
 Likert Scale
+
 1 = Poor (significant issues)
 
 
